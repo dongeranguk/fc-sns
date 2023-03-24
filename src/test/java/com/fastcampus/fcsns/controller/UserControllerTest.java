@@ -2,6 +2,7 @@ package com.fastcampus.fcsns.controller;
 
 import com.fastcampus.fcsns.controller.request.UserJoinRequest;
 import com.fastcampus.fcsns.controller.request.UserLoginRequest;
+import com.fastcampus.fcsns.exception.ErrorCode;
 import com.fastcampus.fcsns.exception.SnsApplicationException;
 import com.fastcampus.fcsns.model.User;
 import com.fastcampus.fcsns.service.UserService;
@@ -62,7 +63,7 @@ public class UserControllerTest {
 
         // TODO : develop
 
-        when(userService.join(userName, password)).thenThrow(new SnsApplicationException());
+        when(userService.join(userName, password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, ""));
 
         mvc.perform(post("/api/v1/users/join")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,7 +96,7 @@ public class UserControllerTest {
         String password = "password";
 
         // When & Then
-        when(userService.login(userName, password)).thenThrow(new SnsApplicationException());
+        when(userService.login(userName, password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, ""));
 
         mvc.perform(post("/api/v1/users/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -111,7 +112,7 @@ public class UserControllerTest {
         String password = "inCorrectPassword";
 
         // When & Then
-        when(userService.login(userName, password)).thenThrow(new SnsApplicationException());
+        when(userService.login(userName, password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, ""));
 
         mvc.perform(post("/api/v1/users/login")
                 .contentType(MediaType.APPLICATION_JSON)
