@@ -31,8 +31,8 @@ public class PostEntity {
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
 
-    @Column(name = "created_at")
-    private Timestamp created_at;
+    @Column(name = "registered_at")
+    private Timestamp registered_at;
 
     @Column
     private Timestamp updated_at;
@@ -41,12 +41,22 @@ public class PostEntity {
     private Timestamp deleted_at;
 
     @PrePersist
-    void created_at() {
-        this.created_at = Timestamp.from(Instant.now());
+    void registered_at() {
+        this.registered_at = Timestamp.from(Instant.now());
     }
 
     @PreUpdate
     void updated_at() {
         this.updated_at = Timestamp.from(Instant.now());
+    }
+
+    public static PostEntity of(String title, String body, UserEntity userEntity) {
+        PostEntity entity = new PostEntity();
+
+        entity.setTitle(title);
+        entity.setBody(body);
+        entity.setUserEntity(userEntity);
+
+        return entity;
     }
 }

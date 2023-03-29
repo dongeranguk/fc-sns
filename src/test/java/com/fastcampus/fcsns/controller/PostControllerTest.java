@@ -1,10 +1,14 @@
 package com.fastcampus.fcsns.controller;
 
 import com.fastcampus.fcsns.controller.request.PostCreateRequest;
+import com.fastcampus.fcsns.service.PostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -14,11 +18,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@SpringBootTest
+@AutoConfigureMockMvc
 public class PostControllerTest {
 
-    @Autowired private MockMvc mvc;
+    @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
+
+    @MockBean private PostService postService;
 
     @Test
     @WithMockUser
@@ -28,7 +35,7 @@ public class PostControllerTest {
         String body = "body";
 
         // When
-        mvc.perform(post("/api/v1/posts")
+        mockMvc.perform(post("/api/v1/posts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body)))
         ).andDo(print())
@@ -45,7 +52,7 @@ public class PostControllerTest {
         String body = "body";
 
         // When
-        mvc.perform(post("/api/v1/posts")
+        mockMvc.perform(post("/api/v1/posts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body)))
         ).andDo(print())
