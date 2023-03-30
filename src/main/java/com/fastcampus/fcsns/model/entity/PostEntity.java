@@ -29,7 +29,7 @@ public class PostEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity userEntity;
+    private UserEntity user;
 
     @Column(name = "registered_at")
     private Timestamp registered_at;
@@ -55,7 +55,7 @@ public class PostEntity {
 
         entity.setTitle(title);
         entity.setBody(body);
-        entity.setUserEntity(userEntity);
+        entity.setUser(userEntity);
 
         return entity;
     }
