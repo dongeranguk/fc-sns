@@ -4,6 +4,7 @@ import com.fastcampus.fcsns.exception.ErrorCode;
 import com.fastcampus.fcsns.exception.SnsApplicationException;
 import com.fastcampus.fcsns.fixture.PostEntityFixture;
 import com.fastcampus.fcsns.fixture.UserEntityFixture;
+import com.fastcampus.fcsns.model.Post;
 import com.fastcampus.fcsns.model.entity.PostEntity;
 import com.fastcampus.fcsns.model.entity.UserEntity;
 import com.fastcampus.fcsns.repository.PostEntityRepository;
@@ -68,12 +69,13 @@ public class PostServiceTest {
         String userName = "userName";
         Integer postId = 1;
 
-        PostEntity postEntity = PostEntityFixture.get(userName, postId);
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 1);
         UserEntity userEntity = postEntity.getUser();
 
         // When
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
         when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+        when(postEntityRepository.saveAndFlush(postEntity)).thenReturn(postEntity);
 
         // Then
         Assertions.assertDoesNotThrow(() -> postService.modify(title, body, userName, postId));
@@ -87,7 +89,7 @@ public class PostServiceTest {
         String userName = "userName";
         Integer postId = 1;
 
-        PostEntity postEntity = PostEntityFixture.get(userName, postId);
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 1);
         UserEntity userEntity = postEntity.getUser();
         // When
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
@@ -106,15 +108,15 @@ public class PostServiceTest {
         String userName = "userName";
         Integer postId = 1;
 
-        PostEntity postEntity = PostEntityFixture.get(userName, postId);
-        UserEntity writer = UserEntityFixture.get("userName1", "aaa");
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 1);
+        UserEntity writer = UserEntityFixture.get("userName", "password", 1);
 
         // When
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(writer));
         when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
 
         // Then
-        SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () -> postService.modify(title, body, writer.getUserName(), postId));
+        SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () -> postService.modify(title, body, userName, postId));
         Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
     }
 }

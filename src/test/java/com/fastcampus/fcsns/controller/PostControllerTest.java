@@ -4,6 +4,8 @@ import com.fastcampus.fcsns.controller.request.PostCreateRequest;
 import com.fastcampus.fcsns.controller.request.PostModifyRequest;
 import com.fastcampus.fcsns.exception.ErrorCode;
 import com.fastcampus.fcsns.exception.SnsApplicationException;
+import com.fastcampus.fcsns.fixture.PostEntityFixture;
+import com.fastcampus.fcsns.model.Post;
 import com.fastcampus.fcsns.service.PostService;
 import com.fastcampus.fcsns.service.PostServiceTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -75,6 +78,9 @@ public class PostControllerTest {
         String title = "title";
         String body = "body";
         Integer postId = 1;
+
+        when(postService.modify(eq(title), eq(body), any(), any()))
+                .thenReturn(Post.fromEntity(PostEntityFixture.get("userName", 1, 1)));
 
         // When
         mockMvc.perform(put("/api/v1/posts/" + postId)
