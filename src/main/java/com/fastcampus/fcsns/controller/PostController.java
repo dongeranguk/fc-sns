@@ -31,5 +31,4 @@ public class PostController {
 
         return Response.success(PostResponse.fromPost(post));
     }
-
 }
