@@ -7,7 +7,6 @@ import com.fastcampus.fcsns.exception.SnsApplicationException;
 import com.fastcampus.fcsns.fixture.PostEntityFixture;
 import com.fastcampus.fcsns.model.Post;
 import com.fastcampus.fcsns.service.PostService;
-import com.fastcampus.fcsns.service.PostServiceTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,10 +30,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class PostControllerTest {
 
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @MockBean private PostService postService;
+    @MockBean
+    private PostService postService;
 
     @Test
     @WithMockUser
@@ -46,9 +47,9 @@ public class PostControllerTest {
 
         // When
         mockMvc.perform(post("/api/v1/posts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body)))
-        ).andDo(print())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body)))
+                ).andDo(print())
                 .andExpect(status().isOk());
 
         // Then
@@ -63,9 +64,9 @@ public class PostControllerTest {
 
         // When
         mockMvc.perform(post("/api/v1/posts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body)))
-        ).andDo(print())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body)))
+                ).andDo(print())
                 .andExpect(status().isUnauthorized());
 
         // Then
@@ -84,9 +85,9 @@ public class PostControllerTest {
 
         // When
         mockMvc.perform(put("/api/v1/posts/" + postId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, postId)))
-        ).andDo(print())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, postId)))
+                ).andDo(print())
                 .andExpect(status().isOk());
 
         // Then
@@ -120,9 +121,9 @@ public class PostControllerTest {
         doThrow(new SnsApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).modify(eq(title), eq(body), any(), eq(postId));
 
         mockMvc.perform(put("/api/v1/posts/" + postId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, postId)))
-        ).andDo(print())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, postId)))
+                ).andDo(print())
                 .andExpect(status().isUnauthorized());
     }
 
@@ -138,11 +139,69 @@ public class PostControllerTest {
         doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).modify(eq(title), eq(body), any(), eq(postId));
 
         mockMvc.perform(put("/api/v1/posts/" + postId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, postId)))
-        ).andDo(print())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, postId)))
+                ).andDo(print())
                 .andExpect(status().isNotFound());
 
         // Then
     }
+
+    @Test
+    @WithMockUser
+    public void 포스트삭제_정상호출() throws Exception {
+        // Given
+        Integer postId = 1;
+
+
+        // When & Then
+        mockMvc.perform(delete("/api/v1/posts/" + postId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 포스트삭제시_로그인하지않은경우_에러반환() throws Exception {
+        // Given
+        Integer postId = 1;
+
+        // When & Then
+        mockMvc.perform(delete("/api/v1/posts" + postId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 포스트삭제시_본인이작성한글이아니라면_에러반환() throws Exception {
+        // Given
+        Integer postId = 1;
+
+        // When & Then
+        doThrow(new SnsApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).delete(any(), any());
+
+        mockMvc.perform(delete("/api/v1/posts" + postId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void 포스트삭제시_삭제할글이없다면_에러반환() throws Exception {
+        // Given
+        Integer postId = 1;
+
+        // When & Then
+        doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).delete(any(), any());
+
+        mockMvc.perform(delete("/api/v1/posts" + postId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isNotFound());
+    }
 }
+
