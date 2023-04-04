@@ -2,6 +2,7 @@ package com.fastcampus.fcsns.fixture;
 
 import com.fastcampus.fcsns.model.entity.PostEntity;
 import com.fastcampus.fcsns.model.entity.UserEntity;
+import org.springframework.data.domain.Page;
 
 public class PostEntityFixture {
 
