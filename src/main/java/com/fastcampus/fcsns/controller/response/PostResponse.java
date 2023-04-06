@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class PostResponse {
 
-    private Integer postId;
+    private Integer id;
 
     private String title;
 
@@ -27,7 +27,7 @@ public class PostResponse {
 
     public static PostResponse fromPost(Post post) {
         return new PostResponse(
-                post.getPostId(),
+                post.getId(),
                 post.getTitle(),
                 post.getBody(),
                 UserResponse.fromUser(post.getUser()),
