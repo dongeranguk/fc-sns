@@ -28,7 +28,7 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public Response<PostResponse> modify(@RequestBody PostModifyRequest request, @PathVariable Integer postId, Authentication authentication) {
+    public Response<PostResponse> modify(@PathVariable Integer postId, @RequestBody PostModifyRequest request, Authentication authentication) {
         Post post = postService.modify(request.getTitle(), request.getBody(), authentication.getName(), postId);
 
         return Response.success(PostResponse.fromPost(post));

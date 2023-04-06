@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class Post {
 
-    private Integer postId;
+    private Integer id;
 
     private String title;
 

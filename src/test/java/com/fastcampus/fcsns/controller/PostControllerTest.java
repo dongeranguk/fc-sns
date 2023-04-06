@@ -88,7 +88,7 @@ public class PostControllerTest {
         // When
         mockMvc.perform(put("/api/v1/posts/" + postId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, postId)))
+                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
                 ).andDo(print())
                 .andExpect(status().isOk());
 
@@ -106,7 +106,7 @@ public class PostControllerTest {
         // When
         mockMvc.perform(put("/api/v1/posts/" + postId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, postId)))
+                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
                 ).andDo(print())
                 .andExpect(status().isUnauthorized());
     }
@@ -124,7 +124,7 @@ public class PostControllerTest {
 
         mockMvc.perform(put("/api/v1/posts/" + postId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, postId)))
+                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
                 ).andDo(print())
                 .andExpect(status().isUnauthorized());
     }
@@ -142,7 +142,7 @@ public class PostControllerTest {
 
         mockMvc.perform(put("/api/v1/posts/" + postId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, postId)))
+                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
                 ).andDo(print())
                 .andExpect(status().isNotFound());
 
