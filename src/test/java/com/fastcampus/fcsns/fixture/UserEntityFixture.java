@@ -12,4 +12,8 @@ public class UserEntityFixture {
         result.setPassword(password);
         return result;
     }
+
+    public static UserEntity empty() {
+        return new UserEntity();
+    }
 }

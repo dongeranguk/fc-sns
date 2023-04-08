@@ -6,6 +6,7 @@ import com.fastcampus.fcsns.fixture.PostEntityFixture;
 import com.fastcampus.fcsns.fixture.UserEntityFixture;
 import com.fastcampus.fcsns.model.entity.PostEntity;
 import com.fastcampus.fcsns.model.entity.UserEntity;
+import com.fastcampus.fcsns.repository.LikeEntityRepository;
 import com.fastcampus.fcsns.repository.PostEntityRepository;
 import com.fastcampus.fcsns.repository.UserEntityRepository;
 import org.junit.jupiter.api.Assertions;
@@ -30,6 +31,8 @@ public class PostServiceTest {
     @MockBean private PostEntityRepository postEntityRepository;
 
     @MockBean private UserEntityRepository userEntityRepository;
+
+    @MockBean private LikeEntityRepository likeEntityRepository;
 
     @Test
     public void 포스트작성이_성공한경우() {
@@ -189,5 +192,21 @@ public class PostServiceTest {
 
         // Then
         Assertions.assertDoesNotThrow(() -> postService.my(pageable, ""));
+    }
+
+    @Test
+    void 좋아요요청이_성공한경우() {
+        // Given
+        Integer postId = 1;
+        UserEntity user = UserEntityFixture.get("userName", "password", 1);
+        PostEntity post = PostEntityFixture.get(user.getUserName(), postId, user.getId());
+
+        // When
+        when(userEntityRepository.findByUserName(user.getUserName())).thenReturn(Optional.of(user));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(likeEntityRepository.findByUserAndPost(user, post));
+
+        // Then
+
     }
 }

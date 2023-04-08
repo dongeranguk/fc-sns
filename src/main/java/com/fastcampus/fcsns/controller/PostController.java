@@ -5,6 +5,7 @@ import com.fastcampus.fcsns.controller.request.PostModifyRequest;
 import com.fastcampus.fcsns.controller.response.PostResponse;
 import com.fastcampus.fcsns.controller.response.Response;
 import com.fastcampus.fcsns.model.Post;
+import com.fastcampus.fcsns.model.entity.PostEntity;
 import com.fastcampus.fcsns.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -52,5 +53,19 @@ public class PostController {
     public Response<Page<PostResponse>> my(Pageable pageable, Authentication authentication) {
 
         return Response.success(postService.my(pageable, authentication.getName()).map(PostResponse::fromPost));
+    }
+
+    @PostMapping("/{postId}/likes")
+    public Response<Void> likes(@PathVariable Integer postId, Authentication authentication) {
+
+        postService.likes(postId, authentication.getName());
+
+        return Response.success();
+    }
+
+    @GetMapping("/{postId}/likes")
+    public Response<Integer> likeCount(@PathVariable Integer postId, Authentication authentication) {
+
+        return Response.success(postService.likeCount(postId));
     }
 }
