@@ -5,7 +5,10 @@ import com.fastcampus.fcsns.controller.request.PostModifyRequest;
 import com.fastcampus.fcsns.exception.ErrorCode;
 import com.fastcampus.fcsns.exception.SnsApplicationException;
 import com.fastcampus.fcsns.fixture.PostEntityFixture;
+import com.fastcampus.fcsns.fixture.UserEntityFixture;
 import com.fastcampus.fcsns.model.Post;
+import com.fastcampus.fcsns.model.User;
+import com.fastcampus.fcsns.model.entity.UserEntity;
 import com.fastcampus.fcsns.service.PostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -255,5 +258,48 @@ public class PostControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
         ).andDo(print())
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void 좋아요클릭시_정상호출() throws Exception {
+        // Given
+        Integer postId = 1;
+
+        // When
+        mockMvc.perform(post("/api/v1/posts/" + postId + "/likes")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 좋아요클릭시_로그인하지않은경우_에러반환() throws Exception {
+        // Given
+        Integer postId = 1;
+        UserEntity user = UserEntityFixture.empty();
+        // When
+        doThrow(new SnsApplicationException(ErrorCode.USER_NOT_FOUND)).when(postService).likes(postId, user.getUserName());
+
+        mockMvc.perform(post("/api/v1/posts/" + postId + "/likes")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void 좋아요클릭시_게시글이없는경우_에러반환() throws Exception {
+        // When
+        // mock 데이터를 만들어 likes 메소드의 파라미터를 채워줬더니 예외가 발생하지 않아 기대한 값('404')와 다르게 나옴('200')
+        // 따라서, 기대한 값 '404'를 결과로 받기 위해 any()로 대체해줌.
+        doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).likes(any(), any());
+
+        mockMvc.perform(post("/api/v1/posts/1/likes")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print())
+                .andExpect(status().isNotFound());
+
     }
 }
