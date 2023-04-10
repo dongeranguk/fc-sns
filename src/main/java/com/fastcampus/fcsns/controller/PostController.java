@@ -1,11 +1,12 @@
 package com.fastcampus.fcsns.controller;
 
+import com.fastcampus.fcsns.controller.request.CommentRequest;
 import com.fastcampus.fcsns.controller.request.PostCreateRequest;
 import com.fastcampus.fcsns.controller.request.PostModifyRequest;
+import com.fastcampus.fcsns.controller.response.CommentResponse;
 import com.fastcampus.fcsns.controller.response.PostResponse;
 import com.fastcampus.fcsns.controller.response.Response;
 import com.fastcampus.fcsns.model.Post;
-import com.fastcampus.fcsns.model.entity.PostEntity;
 import com.fastcampus.fcsns.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -67,5 +68,18 @@ public class PostController {
     public Response<Integer> likeCount(@PathVariable Integer postId, Authentication authentication) {
 
         return Response.success(postService.likeCount(postId));
+    }
+
+    @PostMapping("/{postId}/comments")
+    public Response<Void> comment(@PathVariable Integer postId, @RequestBody CommentRequest request, Authentication authentication) {
+        postService.comment(postId, request.getComment(), authentication.getName());
+
+        return Response.success();
+    }
+
+    @GetMapping("{postId}/comments")
+    public Response<Page<CommentResponse>> comment(@PathVariable Integer postId, Pageable pageable, Authentication authentication) {
+        return Response.success(postService.getComments(postId, pageable).map(CommentResponse::fromComment));
+
     }
 }
