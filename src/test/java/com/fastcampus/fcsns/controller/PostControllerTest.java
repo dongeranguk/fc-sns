@@ -1,5 +1,6 @@
 package com.fastcampus.fcsns.controller;
 
+import com.fastcampus.fcsns.controller.request.CommentRequest;
 import com.fastcampus.fcsns.controller.request.PostCreateRequest;
 import com.fastcampus.fcsns.controller.request.PostModifyRequest;
 import com.fastcampus.fcsns.exception.ErrorCode;
@@ -7,7 +8,6 @@ import com.fastcampus.fcsns.exception.SnsApplicationException;
 import com.fastcampus.fcsns.fixture.PostEntityFixture;
 import com.fastcampus.fcsns.fixture.UserEntityFixture;
 import com.fastcampus.fcsns.model.Post;
-import com.fastcampus.fcsns.model.User;
 import com.fastcampus.fcsns.model.entity.UserEntity;
 import com.fastcampus.fcsns.service.PostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -302,4 +302,56 @@ public class PostControllerTest {
                 .andExpect(status().isNotFound());
 
     }
+
+    @Test
+    @WithMockUser
+    public void 댓글기능_정상호출() throws Exception {
+        // Given
+        Integer postId = 1;
+        String comment = "comment";
+
+        // When & Then
+        mockMvc.perform(post("/api/v1/posts/ "+ postId + "/comments")
+                .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new CommentRequest(comment)))
+        ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 댓글작성시_로그인하지않은경우_에러반환() throws Exception {
+        // Given
+        Integer postId = 1;
+        String userName = "userName";
+        String comment = "comment";
+
+        // When & Then
+        doThrow(new SnsApplicationException(ErrorCode.USER_NOT_FOUND)).when(postService).comment(postId, userName, comment);
+
+        mockMvc.perform(post("/api/v1/posts/" + postId + "/comments")
+                .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new CommentRequest(comment)))
+        ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void 댓글작성시_게시글이없는경우_에러반환() throws Exception {
+        // Given
+        Integer postId = 1;
+        String userName = "userName";
+        String comment = "comment";
+
+        // When & Then
+        doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).comment(any(), any(), any());
+
+        mockMvc.perform(post("/api/v1/posts" + postId + "/comments")
+                .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new CommentRequest(comment)))
+        ).andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
 }
