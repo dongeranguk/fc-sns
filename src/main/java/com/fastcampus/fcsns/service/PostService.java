@@ -2,16 +2,12 @@ package com.fastcampus.fcsns.service;
 
 import com.fastcampus.fcsns.exception.ErrorCode;
 import com.fastcampus.fcsns.exception.SnsApplicationException;
+import com.fastcampus.fcsns.model.AlarmArgs;
+import com.fastcampus.fcsns.model.AlarmType;
 import com.fastcampus.fcsns.model.Comment;
 import com.fastcampus.fcsns.model.Post;
-import com.fastcampus.fcsns.model.entity.CommentEntity;
-import com.fastcampus.fcsns.model.entity.LikeEntity;
-import com.fastcampus.fcsns.model.entity.PostEntity;
-import com.fastcampus.fcsns.model.entity.UserEntity;
-import com.fastcampus.fcsns.repository.CommentEntityRepository;
-import com.fastcampus.fcsns.repository.LikeEntityRepository;
-import com.fastcampus.fcsns.repository.PostEntityRepository;
-import com.fastcampus.fcsns.repository.UserEntityRepository;
+import com.fastcampus.fcsns.model.entity.*;
+import com.fastcampus.fcsns.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +25,8 @@ public class PostService {
     private final PostEntityRepository postEntityRepository;
     private final LikeEntityRepository likeEntityRepository;
     private final CommentEntityRepository commentEntityRepository;
+
+    private final AlarmEntityRepository alarmEntityRepository;
 
     @Transactional
     public void create(String title, String body, String userName) {
@@ -93,6 +91,8 @@ public class PostService {
         // save
         likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
 
+        alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId())));
+
     }
 
     public int likeCount(Integer postId) {
@@ -113,6 +113,8 @@ public class PostService {
 
         // comment save
         commentEntityRepository.save(CommentEntity.of(userEntity, postEntity, comment));
+
+        alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId())));
 
     }
 

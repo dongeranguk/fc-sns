@@ -12,11 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -121,5 +127,33 @@ public class UserControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    @WithMockUser
+    public void 알람기능() throws Exception {
+        // Given
+        String userName = "userName";
+        Pageable pageable = mock(Pageable.class);
+        // When & Then
+        when(userService.alarmList(userName, pageable)).thenReturn(Page.empty());
+        mvc.perform(get("/api/v1/users/alarm")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 알람리스트요청시_로그인하지않은경우_에러반환() throws Exception {
+        // Given
+        String userName = "userName";
+        Pageable pageable = mock(Pageable.class);
+
+        // When & Then
+        when(userService.alarmList(any(), pageable)).thenReturn(Page.empty());
+        mvc.perform(get("/api/v1/users/alarm")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
 
 }
