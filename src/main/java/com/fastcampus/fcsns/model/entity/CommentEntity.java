@@ -13,7 +13,7 @@ import java.time.Instant;
 @Setter
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE \"comment\" SET deleted_at = now() WHERE id = ?")
-@Table(name = "\"comments\"", indexes = {
+@Table(name = "\"comment\"", indexes = {
         @Index(name = "post_id_idx", columnList = "post_id")
 })
 @Entity
