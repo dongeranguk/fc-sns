@@ -131,10 +131,10 @@ public class UserControllerTest {
     @WithMockUser
     public void 알람기능() throws Exception {
         // Given
-        String userName = "userName";
+        Integer userId = 1;
         Pageable pageable = mock(Pageable.class);
         // When & Then
-        when(userService.alarmList(userName, pageable)).thenReturn(Page.empty());
+        when(userService.alarmList(userId, pageable)).thenReturn(Page.empty());
         mvc.perform(get("/api/v1/users/alarm")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andDo(print())
@@ -145,7 +145,7 @@ public class UserControllerTest {
     @WithAnonymousUser
     public void 알람리스트요청시_로그인하지않은경우_에러반환() throws Exception {
         // Given
-        String userName = "userName";
+        Integer userId = 1;
         Pageable pageable = mock(Pageable.class);
 
         // When & Then
