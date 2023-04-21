@@ -99,7 +99,7 @@ function Alarm() {
   useEffect(() => {
     handleGetAlarm();
 
-    eventSource = new EventSource("http://localhost:8080/api/v1/users/alarm/subscribe?token=" + localStorage.getItem('token'));
+    eventSource = new EventSource("/api/v1/users/alarm/subscribe?token=" + localStorage.getItem('token'));
 
     setAlarmEvent(eventSource);
 
